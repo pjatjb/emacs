@@ -1,5 +1,4 @@
 ;;
-
 (setq
  package-check-signature nil
  package-archive-priorities '(("gnu" . 10)
@@ -14,13 +13,17 @@
 (package-initialize)
 (unless package-archive-contents (package-refresh-contents))
 
-(package-install 'use-package)
+;;(require 'use-package)
+
 (use-package use-package-ensure-system-package
   :init
   (setq system-packages-package-manager 'brew
         system-packages-no-confirm t))
+
 (require 'use-package-ensure)
+
 (setq use-package-always-ensure t)
+
 (use-package system-packages)
 
 (use-package exec-path-from-shell
@@ -30,15 +33,22 @@
 
 (use-package auto-package-update
   :config
-  (setq auto-package-update-delete-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (setq auto-package-update-interval 30)
+  (setq auto-package-update-delete-old-versions t
+        auto-package-update-hide-results t
+        auto-package-update-interval 7)
   (auto-package-update-maybe))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Theme
 
-(when (eq system-type 'darwin)
-  (set-face-attribute 'default nil :height 150))
+;;(when (eq system-type 'darwin)
+;;  (set-face-attribute 'default nil :family "Andale Mono" :height 160)
+;;  (set-face-attribute 'default nil :family "Terminus" :height 180)
+;;
+
+(add-to-list 'default-frame-alist
+             '(font . "Terminus (TTF)-18"))
+
+(setq-default mac-allow-anti-aliasing nil)
 
 (use-package auto-dark ;; https://github.com/LionyxML/auto-dark-emacs
   :init
@@ -47,6 +57,26 @@
   :config
   :custom
   (auto-dark-themes '((leuven-dark) (leuven))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Markdown
+
+(use-package flymake-markdownlint
+  :ensure-system-package markdownlint)
+
+;;(use-package markdown-mode ;; needs multimarkdown
+;;  :ensure t
+;;  :ensure flymake-markdownlint
+;;  :hook ((markdown-mode . adaptive-wrap-prefix-mode)
+;;         (markdown-mode . flymake-markdownlint-setup)
+;;         (markdown-mode . flymake-mode)))
+
+(use-package markdown-mode
+  :ensure t
+  :ensure-system-package multimarkdown
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+         ("C-c C-e" . markdown-do)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Multimedia
 
@@ -107,13 +137,11 @@
   :hook
   (prog-mode . yafolding-mode))
 
-(use-package csv-mode
-  :disabled
-;;  :config
-;;  (csv-align-max-width . 80)
-;;  (csv-align-style . 'left)
+(use-package csv-mode)
+
+;  (csv-align-max-width . 80)
+;  (csv-align-style . 'left)
 ;;  (csv-separators . (":"))
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Writing Tools
 
@@ -134,18 +162,6 @@
   :ensure-system-package style)
 
 (use-package writegood-mode) ;; Style checker https://github.com/bnbeckwith/writegood-mode
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Markdown
-
-(use-package flymake-markdownlint
-  :ensure-system-package markdownlint)
-
-(use-package markdown-mode ;; needs multimarkdown
-  :ensure flymake-markdownlint
-  :hook
-  (markdown-mode . adaptive-wrap-prefix-mode)
-  (markdown-mode . flymake-markdownlint-setup)
-  (markdown-mode . flymake-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Programming
 
@@ -174,13 +190,18 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Git & GitHub
 
-(use-package magit)
+(use-package magit
+  :config
+  (setq magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1
+        magit-git-executable "/usr/bin/git"))
 
 (use-package ox-gfm) ;; GFM Markdown can be copied/pasted into Confluence
 
 (use-package lorem-ipsum)
 
 (use-package htmlize) ;; Prevent emacs theme affecting org exports
+
+(use-package org-contrib)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LaTeX
 
@@ -233,8 +254,6 @@
   :init
   (setq ob-mermaid-cli-path "/opt/homebrew/bin/mmdc")) ;; macOS
 ;; npm install -g @mermaid-js/mermaid-cli
-
-(use-package org-contrib)
 
 (use-package org-preview-html) ;; https://github.com/jakebox/org-preview-html
 
@@ -418,6 +437,7 @@
  '(TeX-PDF-mode nil)
  '(TeX-save-query nil)
  '(async-shell-command-buffer 'new-buffer)
+ '(auto-dark-themes '((leuven-dark) (leuven)))
  '(auto-package-update-delete-old-versions t)
  '(auto-package-update-hide-results t)
  '(auto-package-update-interval 30)
@@ -440,10 +460,8 @@
  '(epg-pinentry-mode 'loopback)
  '(flycheck-checker-error-threshold nil)
  '(global-flycheck-mode nil)
- '(global-highlight-changes-mode nil)
  '(global-visual-line-mode t)
  '(gnutls-algorithm-priority "normal:-vers-tls1.3")
- '(highlight-changes-global-changes-existing-buffers t)
  '(image-dired-main-image-directory "~/Pictures")
  '(image-dired-slideshow-delay 2.0)
  '(indent-tabs-mode nil)
@@ -487,14 +505,12 @@
  '(langtool-default-language 'auto)
  '(legacy-style-world-list nil)
  '(line-move-visual nil)
- '(magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1)
- '(magit-git-executable "/usr/bin/git")
  '(markdown-asymmetric-header t)
  '(markdown-command "multimarkdown")
  '(markdown-enable-highlighting-syntax t)
  '(markdown-enable-math t)
  '(markdown-preview-auto-open 'file)
- '(ns-antialias-text t)
+ '(ns-antialias-text nil)
  '(org-adapt-indentation t)
  '(org-agenda-cmp-user-defined
    '\(cond\ \(\(string-collate-lessp\ a\ b\)\ +1\)\ \(\(string-collate-lessp\ b\ a\)\ -1\)\ \(t\ nil\)\))
@@ -530,6 +546,13 @@
  '(org-extend-today-until 2)
  '(org-fold-catch-invisible-edits 'error)
  '(org-indirect-buffer-display 'current-window)
+ '(org-jira-deadline-duedate-sync-p nil)
+ '(org-jira-download-ask-override nil)
+ '(org-jira-download-comments nil)
+ '(org-jira-priority-to-org-priority-omit-default-priority t)
+ '(org-jira-reverse-comment-order t)
+ '(org-jira-use-status-as-todo t)
+ '(org-jira-working-dir "~/org/")
  '(org-link-descriptive t)
  '(org-outline-path-complete-in-steps t)
  '(org-preview-html-viewer 'xwidget)
@@ -566,9 +589,8 @@
  '(org-todo-keywords
    '((sequence "TODO" "BUSY" "OPEN" "IN-PROGRESS" "PENDING-MERGE" "HOLD" "BLOCKED" "MORE-INFO-REQUIRED" "|" "DONE" "CLOSED")))
  '(package-selected-packages
-   '(writegood-mode smog use-package-ensure-system-package use-package eradio yaml-mode yafolding writeroom-mode verilog-mode unfill tramp svg soap-client so-long python plantuml-mode ox-gfm outline-indent org-preview-html org-mind-map org-journal-list org-journal org-jira org-contrib olivetti ob-mermaid ntlm nadvice multiple-cursors multi-term move-dup markdown-mode map magit lorem-ipsum look-mode let-alist langtool jsonnet-mode idlwave htmlize graphviz-dot-mode flymake-markdownlint flycheck-languagetool faceup exec-path-from-shell erc eglot deadgrep csv-mode cl-generic auto-package-update auto-dark auctex adaptive-wrap))
+   '(dynamic-fonts custom-typefaces bind-key cl-lib eldoc external-completion flymake jsonrpc org project seq xref writegood-mode smog use-package-ensure-system-package use-package eradio yaml-mode yafolding writeroom-mode verilog-mode unfill tramp svg soap-client so-long python plantuml-mode ox-gfm outline-indent org-preview-html org-mind-map org-journal-list org-journal org-jira org-contrib olivetti ob-mermaid ntlm nadvice multiple-cursors multi-term move-dup markdown-mode map magit lorem-ipsum look-mode let-alist langtool jsonnet-mode idlwave htmlize graphviz-dot-mode flymake-markdownlint flycheck-languagetool faceup exec-path-from-shell erc eglot deadgrep csv-mode cl-generic auto-package-update auto-dark auctex adaptive-wrap))
  '(safe-local-variable-values '((org-jira-mode . t) org-jira-mode t))
- '(sentence-end-double-space nil)
  '(size-indication-mode t)
  '(split-height-threshold nil)
  '(split-width-threshold nil)
@@ -598,15 +620,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cursor ((t (:background "red1"))))
- '(highlight-changes-delete ((t (:foreground "red1" :underline t))))
  '(markdown-code-face ((t (:inherit nil))))
  '(tab-bar ((t (:background "grey85" :foreground "black"))))
- '(tab-bar-tab ((t (:background "red1" :foreground "white" :weight bold))))
+ '(tab-bar-tab ((t (:background "red" :foreground "white" :weight bold))))
  '(tab-bar-tab-group-current ((t nil)))
  '(tab-bar-tab-inactive ((t nil)))
  '(tab-line ((t (:background "grey85" :foreground "black")))))
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
 (put 'set-goal-column 'disabled nil)
 (put 'scroll-left 'disabled nil)
 (put 'magit-edit-line-commit 'disabled nil)
