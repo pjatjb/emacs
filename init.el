@@ -1,17 +1,22 @@
 ;;
-(setq
- package-check-signature nil
- package-archive-priorities '(("gnu" . 10)
-			      ("nongnu" . 8)
-                              ("melpa" . 5))
- package-archives  '(("melpa" . "https://melpa.org/packages/")
-                     ("gnu" . "https://elpa.gnu.org/packages/")
-                     ("nongnu" . "https://elpa.nongnu.org/nongnu/"))
- package-install-upgrade-built-in t) ;; For Magit on Linux
 
 (require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
-(unless package-archive-contents (package-refresh-contents))
+
+;;(unless package-archive-contents (package-refresh-contents))
+
+(setq
+ package-check-signature nil
+ ;; package-archive-priorities '(("gnu" . 10)
+ ;;        		      ("nongnu" . 8)
+ ;;                              ("melpa" . 5))
+ ;; package-archives  '(
+ ;;                     ("melpa" . "https://melpa.org/packages/")
+ ;;                     ("gnu" . "https://elpa.gnu.org/packages/")
+ ;;                     ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+ ;;                     )
+ package-install-upgrade-built-in t) ;; For Magit on Linux
 
 ;;(require 'use-package)
 
@@ -46,7 +51,7 @@
 ;;
 
 (add-to-list 'default-frame-alist
-             '(font . "Terminus (TTF)-18"))
+             '(font . "Terminus (TTF)-24"))
 
 (setq-default mac-allow-anti-aliasing nil)
 
@@ -78,31 +83,16 @@
   :bind (:map markdown-mode-map
          ("C-c C-e" . markdown-do)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Multimedia
-
-(use-package bongo
-  :disabled
-  :ensure-system-package (vlc))
-
-(use-package eradio ;; https://github.com/olavfosse/eradio
-  :ensure-system-package (vlc)
-  :config
-  (setq  eradio-channels
-         '(("Underground 80s" . "https://somafm.com/u80s256.pls")
-           ("Left Coast 70s" . "https://somafm.com/seventies320.pls")
-           ("Abacus British Comedy" . "http://www.abacusradio.com/british_comedy_radio.html")
-           ("Solar" . "http://msmn4.co/proxy/mp3high33?mp=/"))))
-
-;;(use-package volume)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Editing
 
-(use-package move-dup
+(use-package move-dup ;; https://github.com/wyuenho/move-dup
   :bind
   ("C-M-n" . move-dup-duplicate-down)
-  ("C-M-p" . move-dup-duplicate-up))
+  ("C-M-p" . move-dup-duplicate-up)
+  ("M-n"   . move-dup-move-lines-down)
+  ("M-p"   . move-dup-move-lines-up))
 
-(use-package multiple-cursors
+(use-package multiple-cursors ;; https://github.com/magnars/multiple-cursors.el
   :bind
   ("C-<"           . mc/mark-previous-like-this)
   ("C->"           . mc/mark-next-like-this)
@@ -113,7 +103,9 @@
   (mc/always-repeat-command t)
   (mc/always-run-for-all t))
 
-(use-package unfill)
+(use-package unfill ;; https://github.com/purcell/unfill
+  :bind
+  ("M-Q" . unfill-paragraph))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Views
 
@@ -130,18 +122,13 @@
   ("C-c o" . olivetti-mode))
 
 (use-package writeroom-mode ;; Distraction-free https://github.com/joostkremers/writeroom-mode
+  :disabled
   :config
    (setq writeroom-width 120))
 
 (use-package yafolding
   :hook
   (prog-mode . yafolding-mode))
-
-(use-package csv-mode)
-
-;  (csv-align-max-width . 80)
-;  (csv-align-style . 'left)
-;;  (csv-separators . (":"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Writing Tools
 
@@ -150,6 +137,7 @@
 (use-package flyspell)
 
 (use-package langtool
+  :disabled
   :config
   (setq langtool-default-language 'auto
         langtool-language-tool-jar "/opt/homebrew/opt/languagetool/libexec/languagetool-commandline.jar") ;; macOS
@@ -159,9 +147,11 @@
 (use-package flycheck-languagetool)
 
 (use-package smog ;; Style stats https://github.com/zzkt/smog
+  :disabled
   :ensure-system-package style)
 
-(use-package writegood-mode) ;; Style checker https://github.com/bnbeckwith/writegood-mode
+(use-package writegood-mode
+  :disabled) ;; Style checker https://github.com/bnbeckwith/writegood-mode
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Programming
 
@@ -195,17 +185,19 @@
   (setq magit-display-buffer-function 'magit-display-buffer-same-window-except-diff-v1
         magit-git-executable "/usr/bin/git"))
 
-(use-package ox-gfm) ;; GFM Markdown can be copied/pasted into Confluence
+(use-package ox-gfm
+  :disabled) ;; GFM Markdown can be copied/pasted into Confluence
 
-(use-package lorem-ipsum)
+(use-package lorem-ipsum
+  :disabled)
 
-(use-package htmlize) ;; Prevent emacs theme affecting org exports
-
-(use-package org-contrib)
+(use-package htmlize
+  :disabled) ;; Prevent emacs theme affecting org exports
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LaTeX
 
 (use-package latex
+  :disabled
 ;; parented by auctex, needs pdflatex (mactex-no-gui or texlive-full)
   :ensure auctex
   :custom
@@ -242,20 +234,25 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Graphics
 
+(use-package org-contrib)
+
 (use-package graphviz-dot-mode ;; https://github.com/ppareit/graphviz-dot-mode
+  :disabled
   :ensure-system-package (dot . graphviz))
 
 (use-package plantuml-mode
+  :disabled
   :ensure-system-package plantuml
   :init
   (setq org-plantuml-jar-path "/opt/homebrew/Cellar/plantuml/1.2025.0/libexec/plantuml.jar")) ;; macOS - Path changes regularly
 
 (use-package ob-mermaid
+  :disabled
   :init
   (setq ob-mermaid-cli-path "/opt/homebrew/bin/mmdc")) ;; macOS
 ;; npm install -g @mermaid-js/mermaid-cli
 
-(use-package org-preview-html) ;; https://github.com/jakebox/org-preview-html
+;;(use-package org-preview-html) ;; https://github.com/jakebox/org-preview-html
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Task management
 
@@ -273,7 +270,10 @@
          org-journal-file-header "#+BEGIN: clocktable :link t :scope agenda :fileskip0 t :stepskip0 t :hidefiles t :tags t :indent nil :narrow 200 :tcolumns 2 :step day :block %Y\n#+END:"
          ))
 
-(use-package org-journal-list)
+(use-package org-journal-list ;; https://github.com/huytd/org-journal-list
+  :disabled
+  :config
+  (setq org-journal-list-default-directory "~/org/journal/"))
 
 (use-package org-jira ;; https://github.com/ahungry/org-jira
   :custom
@@ -299,6 +299,7 @@
   :ensure-system-package rg)
 
 (use-package deft ;; https://github.com/jrblevin/deft
+  :disabled
   :bind
   ("C-c d d" . deft)
   ("C-c d m" . deft-new-file-named)
@@ -318,6 +319,27 @@
 
 ;;(use-package ox-reveal :config (setq org-reveal-title-slide nil)) ;;(setq org-reveal-root "file:///path/to/reveal.js") ;; Or use REVEAL_ROOT in org file
 ;;(use-package projectile :disabled :init (projectile-mode +1) :config (setq projectile-project-search-path '("~/Documents/projects/" ("~/gh" . 1))) :bind (:map projectile-mode-map ("s-p" . projectile-command-map) ("C-c p" . projectile-command-map))) ;; https://docs.projectile.mx/projectile/
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Multimedia
+
+(use-package bongo
+  :disabled
+  :ensure-system-package (vlc))
+
+(use-package eradio ;; https://github.com/olavfosse/eradio
+  :disabled
+  :ensure-system-package (vlc)
+  :config
+  (setq  eradio-channels
+         '(("Underground 80s" . "https://somafm.com/u80s256.pls")
+           ("Left Coast 70s" . "https://somafm.com/seventies320.pls")
+           ("Abacus British Comedy" . "http://www.abacusradio.com/british_comedy_radio.html")
+           ("Solar" . "http://msmn4.co/proxy/mp3high33?mp=/"))))
+
+;;(use-package volume)
+
+
+
 
 ;; Publish an org-based static website
 ;; (require 'ox-publish)
@@ -419,9 +441,6 @@
 (keymap-global-set "C-c m"         'calendar)
 (keymap-global-set "C-c n"         'org-num-mode)
 (keymap-global-set "C-x C-b"       'buffer-menu) ;; Go directly to buffer list
-(keymap-global-set "M-Q"           'unfill-paragraph)
-(keymap-global-set "M-n"           'move-dup-move-lines-down)
-(keymap-global-set "M-p"           'move-dup-move-lines-up)
 
 (with-eval-after-load 'magit-mode (define-key magit-mode-map (kbd "<C-tab>") nil)) ;; Keep C-Tab for Tab navigation
 
@@ -539,7 +558,8 @@
  '(org-default-notes-file "~/org/capture.org")
  '(org-ditaa-jar-path
    "/opt/homebrew/Cellar/ditaa/0.11.0_1/libexec/ditaa-0.11.0-standalone.jar")
- '(org-export-backends '(ascii html latex md odt confluence))
+ '(org-duration-format 'h:mm)
+ '(org-export-backends '(ascii html latex md odt))
  '(org-export-with-entities nil)
  '(org-export-with-properties nil)
  '(org-export-with-toc nil)
@@ -589,7 +609,7 @@
  '(org-todo-keywords
    '((sequence "TODO" "BUSY" "OPEN" "IN-PROGRESS" "PENDING-MERGE" "HOLD" "BLOCKED" "MORE-INFO-REQUIRED" "|" "DONE" "CLOSED")))
  '(package-selected-packages
-   '(dynamic-fonts custom-typefaces bind-key cl-lib eldoc external-completion flymake jsonrpc org project seq xref writegood-mode smog use-package-ensure-system-package use-package eradio yaml-mode yafolding writeroom-mode verilog-mode unfill tramp svg soap-client so-long python plantuml-mode ox-gfm outline-indent org-preview-html org-mind-map org-journal-list org-journal org-jira org-contrib olivetti ob-mermaid ntlm nadvice multiple-cursors multi-term move-dup markdown-mode map magit lorem-ipsum look-mode let-alist langtool jsonnet-mode idlwave htmlize graphviz-dot-mode flymake-markdownlint flycheck-languagetool faceup exec-path-from-shell erc eglot deadgrep csv-mode cl-generic auto-package-update auto-dark auctex adaptive-wrap))
+   '(org-journal-list org-journal bind-key cl-lib eldoc external-completion flymake jsonrpc project seq xref writegood-mode use-package-ensure-system-package use-package eradio yaml-mode yafolding writeroom-mode verilog-mode unfill tramp svg soap-client so-long python plantuml-mode ox-gfm outline-indent org-mind-map org-jira olivetti ob-mermaid ntlm nadvice multiple-cursors multi-term move-dup markdown-mode map magit lorem-ipsum look-mode let-alist langtool jsonnet-mode idlwave htmlize graphviz-dot-mode flymake-markdownlint flycheck-languagetool faceup exec-path-from-shell erc eglot deadgrep csv-mode cl-generic auto-package-update auto-dark auctex adaptive-wrap))
  '(safe-local-variable-values '((org-jira-mode . t) org-jira-mode t))
  '(size-indication-mode t)
  '(split-height-threshold nil)
