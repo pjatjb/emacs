@@ -6,24 +6,11 @@
 
 ;;(unless package-archive-contents (package-refresh-contents))
 
-(setq
- package-check-signature nil
- ;; package-archive-priorities '(("gnu" . 10)
- ;;        		      ("nongnu" . 8)
- ;;                              ("melpa" . 5))
- ;; package-archives  '(
- ;;                     ("melpa" . "https://melpa.org/packages/")
- ;;                     ("gnu" . "https://elpa.gnu.org/packages/")
- ;;                     ("nongnu" . "https://elpa.nongnu.org/nongnu/")
- ;;                     )
- package-install-upgrade-built-in t) ;; For Magit on Linux
-
-;;(require 'use-package)
+(setq package-check-signature nil)
 
 (use-package use-package-ensure-system-package
   :init
-  (setq system-packages-package-manager 'brew
-        system-packages-no-confirm t))
+  (setq system-packages-no-confirm t))
 
 (require 'use-package-ensure)
 
@@ -45,15 +32,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Theme
 
-;;(when (eq system-type 'darwin)
-;;  (set-face-attribute 'default nil :family "Andale Mono" :height 160)
-;;  (set-face-attribute 'default nil :family "Terminus" :height 180)
-;;
-
 (add-to-list 'default-frame-alist
-             '(font . "Terminus (TTF)-24"))
-
-(setq-default mac-allow-anti-aliasing nil)
+             '(font . "Terminus (TTF)-22"))
 
 (use-package auto-dark ;; https://github.com/LionyxML/auto-dark-emacs
   :init
@@ -68,13 +48,6 @@
 (use-package flymake-markdownlint
   :ensure-system-package markdownlint)
 
-;;(use-package markdown-mode ;; needs multimarkdown
-;;  :ensure t
-;;  :ensure flymake-markdownlint
-;;  :hook ((markdown-mode . adaptive-wrap-prefix-mode)
-;;         (markdown-mode . flymake-markdownlint-setup)
-;;         (markdown-mode . flymake-mode)))
-
 (use-package markdown-mode
   :ensure t
   :ensure-system-package multimarkdown
@@ -84,6 +57,8 @@
          ("C-c C-e" . markdown-do)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Editing
+
+(use-package counsel) ;; https://github.com/abo-abo/swiper
 
 (use-package move-dup ;; https://github.com/wyuenho/move-dup
   :bind
@@ -113,7 +88,7 @@
   :hook
   (markdown-mode . adaptive-wrap-prefix-mode))
 
-(use-package look-mode)                ;; Browse all files in a list
+(use-package look-mode) ;; Browse all files in a list
 
 (use-package olivetti ;; https://github.com/rnkn/olivetti
   :init
@@ -130,6 +105,8 @@
   :hook
   (prog-mode . yafolding-mode))
 
+(use-package goto-chg)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Writing Tools
 
 (use-package flycheck)
@@ -139,8 +116,7 @@
 (use-package langtool
   :disabled
   :config
-  (setq langtool-default-language 'auto
-        langtool-language-tool-jar "/opt/homebrew/opt/languagetool/libexec/languagetool-commandline.jar") ;; macOS
+  (setq langtool-default-language 'auto)
   :ensure-system-package
   ((java) (languagetool)))
 
@@ -169,6 +145,10 @@
 
 ;;(use-package realgud :config (setq realgud:pdb-command-name "python3 -m pdb")) ;; https://github.com/realgud/realgud
 ;;(use-package slime) ;; lisp
+
+(use-package counsel-jq ;; https://github.com/200ok-ch/counsel-jq
+  :config
+  (setq counsel-jq-command "yq"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Terminals
 
@@ -234,7 +214,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Graphics
 
-(use-package org-contrib)
+;;(use-package org-contrib)
 
 (use-package graphviz-dot-mode ;; https://github.com/ppareit/graphviz-dot-mode
   :disabled
@@ -242,14 +222,10 @@
 
 (use-package plantuml-mode
   :disabled
-  :ensure-system-package plantuml
-  :init
-  (setq org-plantuml-jar-path "/opt/homebrew/Cellar/plantuml/1.2025.0/libexec/plantuml.jar")) ;; macOS - Path changes regularly
+  :ensure-system-package plantuml)
 
 (use-package ob-mermaid
-  :disabled
-  :init
-  (setq ob-mermaid-cli-path "/opt/homebrew/bin/mmdc")) ;; macOS
+  :disabled)
 ;; npm install -g @mermaid-js/mermaid-cli
 
 ;;(use-package org-preview-html) ;; https://github.com/jakebox/org-preview-html
@@ -338,8 +314,26 @@
 
 ;;(use-package volume)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; macOS vs Linux
+
+(when (eq system-type 'darwin)
+  (setq system-packages-package-manager 'brew)
+  (setq-default mac-allow-anti-aliasing nil)
+  (setq langtool-language-tool-jar "/opt/homebrew/opt/languagetool/libexec/languagetool-commandline.jar")
+  (setq org-plantuml-jar-path "/opt/homebrew/Cellar/plantuml/1.2025.0/libexec/plantuml.jar") ;; Path changes each update
+  (setq ob-mermaid-cli-path "/opt/homebrew/bin/mmdc")
+  ;; when using Windows keyboard on Mac, the insert key is mapped to <help>
+  ;; copy ctrl-insert, paste shift-insert on windows keyboard
+  (global-set-key [C-help] #'clipboard-kill-ring-save)
+  (global-set-key [S-help] #'clipboard-yank)
+  (global-set-key [help] #'overwrite-mode) ;; Press insert to toggle `overwrite-mode'
+  (setq dired-use-ls-dired nil)) ;; macOS complains
+
+(when (eq system-type 'gnu/linux)
+  (setq package-install-upgrade-built-in t)) ;; For Magit
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Misc
 
 ;; Publish an org-based static website
 ;; (require 'ox-publish)
@@ -359,6 +353,8 @@
 ;;          :recursive t
 ;;          :publishing-function org-publish-attachment)
 ;;         ("my-docs" :components ("org-notes" "org-static"))))
+
+(use-package uuidgen) ;; https://github.com/kanru/uuidgen-el
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Custom functions
 
@@ -418,14 +414,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Keymaps
 
-(when (eq system-type 'darwin)
-  ;; when using Windows keyboard on Mac, the insert key is mapped to <help>
-  ;; copy ctrl-insert, paste shift-insert on windows keyboard
-  (global-set-key [C-help] #'clipboard-kill-ring-save)
-  (global-set-key [S-help] #'clipboard-yank)
-  (global-set-key [help] #'overwrite-mode) ;; Press insert to toggle `overwrite-mode'
-  (setq dired-use-ls-dired nil)) ;; macOS complains
-
 ;; Allow spaces in minibuffer (for org-roam)
 (define-key minibuffer-local-completion-map (kbd "SPC") 'self-insert-command)
 
@@ -461,6 +449,7 @@
  '(auto-package-update-hide-results t)
  '(auto-package-update-interval 30)
  '(auto-save-file-name-transforms '((".*" "~/.emacs_saves/" t)))
+ '(backup-by-copying t)
  '(backup-directory-alist '(("." . "~/.emacs_saves")))
  '(blink-cursor-blinks 0)
  '(calendar-date-style 'iso)
@@ -521,6 +510,8 @@
                                (or \.author.emailAddress "")
                                "@"))))))
                 wl))))))
+ '(kept-new-versions 10)
+ '(kept-old-versions 10)
  '(langtool-default-language 'auto)
  '(legacy-style-world-list nil)
  '(line-move-visual nil)
@@ -609,7 +600,7 @@
  '(org-todo-keywords
    '((sequence "TODO" "BUSY" "OPEN" "IN-PROGRESS" "PENDING-MERGE" "HOLD" "BLOCKED" "MORE-INFO-REQUIRED" "|" "DONE" "CLOSED")))
  '(package-selected-packages
-   '(org-journal-list org-journal bind-key cl-lib eldoc external-completion flymake jsonrpc project seq xref writegood-mode use-package-ensure-system-package use-package eradio yaml-mode yafolding writeroom-mode verilog-mode unfill tramp svg soap-client so-long python plantuml-mode ox-gfm outline-indent org-mind-map org-jira olivetti ob-mermaid ntlm nadvice multiple-cursors multi-term move-dup markdown-mode map magit lorem-ipsum look-mode let-alist langtool jsonnet-mode idlwave htmlize graphviz-dot-mode flymake-markdownlint flycheck-languagetool faceup exec-path-from-shell erc eglot deadgrep csv-mode cl-generic auto-package-update auto-dark auctex adaptive-wrap))
+   '(goto-adaptive-wrap auto-dark auto-package-update counsel counsel-jq deadgrep exec-path-from-shell flycheck-languagetool flymake-markdownlint jsonnet-mode look-mode magit markdown-mode move-dup multi-term multiple-cursors olivetti org-jira org-journal org-journal-list system-packages unfill yafolding yaml-mode))
  '(safe-local-variable-values '((org-jira-mode . t) org-jira-mode t))
  '(size-indication-mode t)
  '(split-height-threshold nil)
@@ -626,6 +617,8 @@
  '(tool-bar-mode nil)
  '(tramp-default-method "ssh")
  '(tramp-encoding-shell "/bin/bash")
+ '(vc-make-backup-files t)
+ '(version-control t)
  '(visible-bell t)
  '(world-clock-list
    '(("Australia/Melbourne" "Melbourne")
