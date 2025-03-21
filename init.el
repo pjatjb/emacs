@@ -1,5 +1,4 @@
 ;;
-
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
@@ -32,21 +31,19 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Theme
 
-(add-to-list 'default-frame-alist
-             '(font . "Terminus (TTF)-22"))
-
 (use-package auto-dark ;; https://github.com/LionyxML/auto-dark-emacs
   :init
   (setq auto-dark-allow-osascript t)
-  (auto-dark-mode)
-  :config
-  :custom
-  (auto-dark-themes '((leuven-dark) (leuven))))
+  (auto-dark-mode))
+
+;;(set-face-attribute 'default nil :height 220)
+(add-to-list 'default-frame-alist
+             '(font . "Terminus (TTF)-18"))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Markdown
 
-(use-package flymake-markdownlint
-  :ensure-system-package markdownlint)
+(use-package flymake-markdownlint)
 
 (use-package markdown-mode
   :ensure t
@@ -318,7 +315,6 @@
 
 (when (eq system-type 'darwin)
   (setq system-packages-package-manager 'brew)
-  (setq-default mac-allow-anti-aliasing nil)
   (setq langtool-language-tool-jar "/opt/homebrew/opt/languagetool/libexec/languagetool-commandline.jar")
   (setq org-plantuml-jar-path "/opt/homebrew/Cellar/plantuml/1.2025.0/libexec/plantuml.jar") ;; Path changes each update
   (setq ob-mermaid-cli-path "/opt/homebrew/bin/mmdc")
@@ -328,6 +324,7 @@
   (global-set-key [S-help] #'clipboard-yank)
   (global-set-key [help] #'overwrite-mode) ;; Press insert to toggle `overwrite-mode'
   (setq dired-use-ls-dired nil)) ;; macOS complains
+  (setq-default mac-allow-anti-aliasing nil)
 
 (when (eq system-type 'gnu/linux)
   (setq package-install-upgrade-built-in t)) ;; For Magit
@@ -444,7 +441,6 @@
  '(TeX-PDF-mode nil)
  '(TeX-save-query nil)
  '(async-shell-command-buffer 'new-buffer)
- '(auto-dark-themes '((leuven-dark) (leuven)))
  '(auto-package-update-delete-old-versions t)
  '(auto-package-update-hide-results t)
  '(auto-package-update-interval 30)
@@ -473,7 +469,6 @@
  '(image-dired-main-image-directory "~/Pictures")
  '(image-dired-slideshow-delay 2.0)
  '(indent-tabs-mode nil)
- '(inhibit-startup-screen t)
  '(jiralib-update-issue-fields-exclude-list nil)
  '(jiralib-url "https://jitterbit.atlassian.net")
  '(jiralib-worklog-import--filters-alist
@@ -516,11 +511,10 @@
  '(legacy-style-world-list nil)
  '(line-move-visual nil)
  '(markdown-asymmetric-header t)
- '(markdown-command "multimarkdown")
+ '(markdown-command "multimarkdown" t)
  '(markdown-enable-highlighting-syntax t)
  '(markdown-enable-math t)
  '(markdown-preview-auto-open 'file)
- '(ns-antialias-text nil)
  '(org-adapt-indentation t)
  '(org-agenda-cmp-user-defined
    '\(cond\ \(\(string-collate-lessp\ a\ b\)\ +1\)\ \(\(string-collate-lessp\ b\ a\)\ -1\)\ \(t\ nil\)\))
@@ -617,7 +611,6 @@
  '(tool-bar-mode nil)
  '(tramp-default-method "ssh")
  '(tramp-encoding-shell "/bin/bash")
- '(vc-make-backup-files t)
  '(version-control t)
  '(visible-bell t)
  '(world-clock-list
